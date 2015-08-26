@@ -1,5 +1,5 @@
-var Target = require('./lib/target');
-var Config = require('./');
+var Target = require('../lib/target');
+var Config = require('..');
 
 var tasks = {
   config: {
@@ -9,7 +9,7 @@ var tasks = {
   },
   verb: {
     readme: {
-      options: {e: 'f', x: 'y'},
+      options: {e: 'f', x: 'y', expand: true},
       pipeline: [],
       src: '<%= assemble.site.src %>',
       dest: 'bar/',
@@ -18,7 +18,7 @@ var tasks = {
     docs: {
       deps: [],
       run: function() {},
-      options: {hhh: 'iii'},
+      options: {hhh: 'iii', expand: true},
       pipeline: [],
       files: [
         {src: 'fixtures/files/a/*.*', dest: '<%= config.base.dest %>/b', options: {}},
@@ -50,11 +50,20 @@ var tasks = {
           dest: 'build/',
           ext: '.min.js',
           extDot: 'first'
+        },
+        {
+          expand: true,
+          cwd: 'fixtures/files/',
+          src: ['**/*.js'],
+          dest: 'build/',
+          ext: '.min.js',
+          extDot: 'first'
         }
       ]
     },
     blog: {
       deps: [],
+      flow: 'series',
       options: {e: 'f', x: 'y'},
       pipeline: [],
       files: {
@@ -125,21 +134,54 @@ var tasks = {
 // });
 // console.log(res15a)
 
+function removeSlashes(fp) {
+  if (fp.slice(-1) === '/') {
+    fp = fp.slice(0, fp.length - 1);
+  }
+  if (fp[0] === '/') {
+    fp = fp.slice(1);
+  }
+  return fp;
+}
 
 
 var target = new Target({
   base: 'bar',
   pipeline: [],
   options: {a: 'b'},
-  expand: true,
-  src: 'fixtures/files/**/*.js',
-  dest: 'dist/'
+  run: ['foo', function() {}],
+  // flatten: true,
+  cwd: 'fixtures/files',
+  dir: function (fp) {
+    fp = fp.replace(removeSlashes(this.cwd), '');
+    console.log(this.cwd)
+    return removeSlashes(fp);
+  },
+  expand: ':dest/:dir(path)',
+  src: '**/*.js',
+  dest: 'dist'
+
+  // options: {},
+  // files: [{
+  //   src: 'fixtures/files/**/*.js',
+  //   dest: 'dist/'
+  // }]
 });
 
 console.log(target)
 
-// var config = new Config(tasks);
-// var docs = config.task('assemble.docs');
-// console.log(docs.files);
+app.task(target.name, target.options, function () {
+  return app.src(target.src)
+    .pipe(target.pipeline)
+    .pipe(app.dest(target.dest))
+});
 
-// console.log(config.toArray('verb', 'docs'))
+if (target.run) {
+  app.run.apply(app, target.run);
+}
+
+// var config = new Config(tasks);
+// // var docs = config.task('assemble.docs');
+// // console.log(docs.files);
+
+// console.log(config.toArray('verb'))
