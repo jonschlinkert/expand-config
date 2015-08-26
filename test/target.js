@@ -14,7 +14,7 @@ describe('targets', function () {
   describe('constructor', function () {
     it('should set a target `name` when passed as the first arg.', function () {
       var target = new Target('foo', {src: 'a', dest: 'b'});
-      assert.equal(target.name, 'foo');
+      assert.equal(target.targetname, 'foo');
     });
 
     it('should add a parent property if parent is passed:', function () {
@@ -22,9 +22,11 @@ describe('targets', function () {
       assert.deepEqual(target.parent, {});
     });
 
-    it('should add a `taskname` property if passed on parent:', function () {
-      var target = new Target('foo', {}, {taskname: 'jshint'});
-      assert.equal(target.taskname, 'jshint');
+    it('should add a `task` property if passed on parent:', function () {
+      var a = new Target({}, {taskname: 'jshint'});
+      assert.equal(a.taskname, 'jshint');
+      var b = new Target({}, {task: 'assemble'});
+      assert.equal(b.taskname, 'assemble');
     });
   });
 
@@ -42,35 +44,49 @@ describe('targets', function () {
     it('should extend node options with target options', function () {
       var target = new Target({options: {a: 'b'}, src: 'a', foo: 'bar'});
 
-      assert.deepEqual(target.config, {
-        foo: 'bar',
-        options: {a: 'b'},
-        files: [{
-          options: {a: 'b'},
-          src: ['a'],
-          foo: 'bar'
-        }]
-      });
+      target.config.should.have.property('options');
+      target.config.options.should.have.property('a', 'b');
     });
   });
+
+  describe('parent', function () {
+    it('should extend target.options with task options.', function () {
+      var task = {options: {foo: 'bar'}};
+      var target = new Target({src: 'a', dest: 'b'}, task);
+      target.config.should.have.property('options');
+      target.config.options.should.have.property('foo', 'bar');
+    });
+
+    it('should not overwrite existing target.options with task options.', function () {
+      var task = {options: {foo: 'bar'}};
+      var target = new Target({
+        src: 'a',
+        dest: 'b',
+        options: {
+          foo: 'baz'
+        }
+      }, task);
+      target.config.should.have.property('options');
+      target.config.options.should.have.property('foo', 'baz');
+    });
+  });
+
   describe('files', function () {
     it('should move `src` and `dest` to files.', function () {
       var target = new Target('lint', {src: 'a', dest: 'b'});
-      assert.deepEqual(target.config.files, [{name: 'lint', options: {}, src: ['a'], dest: 'b'}]);
+      target.config.should.have.property('files');
+      target.config.files[0].should.have.properties(['src', 'dest']);
+      target.config.should.not.have.properties(['src', 'dest']);
     });
 
     it('should arrayify the `files` property', function () {
       var target = new Target({files: {src: 'a', dest: 'b'}});
       assert(Array.isArray(target.config.files));
-      assert.deepEqual(target.config.files, [{options: {}, src: ['a'], dest: 'b'}]);
     });
 
     it('should arrayify the `src` property', function () {
       var a = new Target({files: {src: 'a', dest: 'b'}});
-      assert.deepEqual(a.config.files[0].src, ['a']);
-
-      var b = new Target({src: 'a', dest: 'b'});
-      assert.deepEqual(b.config.files[0].src, ['a']);
+      assert(Array.isArray(a.config.files[0].src));
     });
 
     it('should expand `src` glob patterns:', function () {
@@ -84,29 +100,24 @@ describe('targets', function () {
       assert(utils.contains(target.config.files[0].src, 'b.txt'));
       assert(utils.contains(target.config.files[0].src, 'c.txt'));
     });
+  });
 
-    it.skip('should convert target nodes to a flattened array:', function () {
-      var target = new Target('foo', {
-        options: {aaa: 'bbb'},
-        files: [
-          {options: {aaa: 'ccc'}, src: 'a', dest: 'b'},
-          {options: {ddd: 'eee'}, src: 'c', dest: 'd'},
-        ]
-      });
-      // console.log(target)
-      // assert.deepEqual(target.config.files, [{options: {}, src: ['a'], dest: 'b'}]);
-    });
-
-    it.skip('should convert target nodes to a flattened array:', function () {
-      var target = new Target('foo', {
-        options: {aaa: 'bbb', cwd: 'whatever'},
+  describe('options.extend', function () {
+    it('should extend expanded nodes with target properties:', function () {
+      var target = new Target('lib', {
+        options: {aaa: 'bbb', cwd: 'test/fixtures/'},
         expand: true,
+        extend: true,
         files: [
-          {options: {aaa: 'ccc'}, src: 'test/fixtures/*.js', dest: 'b'},
-          {options: {ddd: 'eee'}, src: 'test/fixtures/*.txt', dest: 'd'},
+          {options: {aaa: 'ccc'}, src: '*.js', dest: 'b'},
+          {options: {ddd: 'eee'}, src: '*.txt', dest: 'd'},
+          {cwd: 'faux/', src: '*.txt', dest: 'd', foo: 'bar'},
         ]
-      });
+      }, {taskname: 'jshint'});
 
+      target.config.files[0].should.have.property('options');
+      target.config.files[0].should.have.property('taskname', 'jshint');
+      target.config.files[0].should.have.property('targetname', 'lib');
     });
   });
 
@@ -151,6 +162,50 @@ describe('targets', function () {
       it('should expand `src-dest` mappings:', function () {
         var target = new Target({src: 'test/fixtures/*.txt'});
         assert(utils.contains(target.config.files[0].src, 'test/fixtures/a.txt'));
+      });
+    });
+  });
+
+  describe('target nodes', function () {
+    describe('options.process', function () {
+      it('should resolve templates in config values:', function () {
+        var target = new Target({
+          src: '*.txt',
+          cwd: '<%= foo %>',
+          process: true,
+          expand: true,
+          foo: 'test/fixtures'
+        });
+
+        // console.log(inspect(target))
+        target.config.options.cwd.should.equal('test/fixtures');
+      });
+    });
+
+    describe('options.process - target', function () {
+      it('should resolve templates in config values:', function () {
+        var target = new Target({
+          src: '*.txt',
+          cwd: '<%= foo %>',
+          process: 'target',
+          expand: true,
+          foo: 'test/fixtures',
+          bar: '<%= options.cwd %>',
+          baz: '<%= cwd %>',
+        });
+
+        /**
+         * should (just) work...
+         */
+
+        // on reserved properties that are moved to options
+        target.config.options.cwd.should.equal('test/fixtures');
+
+        // on templates for reserved properties that are moved to options
+        target.config.bar.should.equal('test/fixtures');
+
+        // on the `orig` value of reserved properties
+        target.config.baz.should.equal('test/fixtures');
       });
     });
   });

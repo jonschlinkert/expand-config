@@ -4,7 +4,8 @@ var path = require('path');
 var util = require('util');
 var assert = require('assert');
 var should = require('should');
-var utils = require('../lib/utils');
+var extend = require('extend-shallow');
+var expand = require('expand');
 var Mapping = require('../lib/files');
 
 var inspect = function (obj) {
@@ -250,6 +251,28 @@ describe('expand mapping:', function () {
     assert.deepEqual(actual, expected);
   });
 
+  it('should expose target properties to rename function:', function () {
+    var actual = new Mapping({
+      options: {
+        expand: true,
+        filter: 'isFile',
+        permalink: ':dest/:upper(basename)',
+        upper: function (str) {
+          return str.toUpperCase();
+        },
+        rename: function (dest, fp, options) {
+          var pattern = options.permalink;
+          var ctx = extend({}, this, options, {dest: dest});
+          ctx.ext = ctx.extname;
+          return expand(pattern, ctx, {regex: /:([(\w ),]+)/});
+        }
+      },
+      src: ['**/*'],
+      dest: 'foo/bar'
+    });
+
+  });
+
   it('should group source arrays by dest paths:', function () {
     var actual = new Mapping({
       options: {
@@ -263,7 +286,6 @@ describe('expand mapping:', function () {
       src: ['{a,b}/**/*'],
       dest: 'dest'
     });
-    console.log(actual)
 
     expected = [{
       src: ['a/a.txt', 'a/aa/aa.txt', 'a/aa/aaa/aaa.txt'],
@@ -324,5 +346,18 @@ describe('expand mapping:', function () {
     }];
 
     assert.deepEqual(actual, expected);
+  });
+
+  it('should throw an error when the filter argument is invalid:', function () {
+    (function () {
+      var actual = new Mapping({
+        options: {
+          expand: true,
+          filter: 'isFil'
+        },
+        src: ['{a,b}/**/*'],
+        dest: 'dest'
+      });
+    }).should.throw('[options.filter] `isFil` is not a valid fs.lstat method name');
   });
 });

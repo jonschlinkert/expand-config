@@ -17,14 +17,10 @@ describe('files', function () {
       assert.deepEqual(actual, {foo: 'bar', options: {}});
     });
 
-    it('should move `src` and `dest` to files.', function () {
-      var actual = new Mapping({src: 'a', dest: 'b'});
-      assert.deepEqual(actual, { src: [ 'a' ], dest: 'b', options: {} });
-    });
-
     it('should arrayify the `src` property', function () {
       var actual = new Mapping({src: 'a', dest: 'b'});
-      assert.deepEqual(actual.src, ['a']);
+      actual.should.have.property('src');
+      assert(Array.isArray(actual.src));
     });
 
     it('should expand `src` glob patterns:', function () {

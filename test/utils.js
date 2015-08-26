@@ -1,5 +1,6 @@
 'use strict';
 
+/* deps: mocha */
 var util = require('util');
 var assert = require('assert');
 var utils = require('../lib/utils');
