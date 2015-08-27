@@ -22,32 +22,23 @@ function Config(config) {
   }
 }
 
-function verify(name, obj) {
-  var keys = ['files', 'src', 'dest', 'options'];
-  if (utils.contains(keys, name)) {
-    return true;
-  }
-  for (var key in obj) {
-    if (utils.contains(keys, key)) {
-      return true;
-    }
-    if (utils.hasValues(obj[key], keys)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 Config.prototype = {
   constructor: Config,
 
   addTask: function (name, config) {
-    if (name) this.validate(name);
+    if (reserved.all.indexOf(name) < 0) {
+      this.tasks[name] = this.createTask(name, config);
+    }
+    return this;
+  },
+
+  createTask: function (name, config) {
+    if (typeof name === 'string') {
+      this.validate(name);
+    }
 
     // if it's not a task, just add it to the root
-    // and return
-    var checkProps = verify(name, config);
-    if (!checkProps) {
+    if (!isTask(name, config)) {
       this.set(name, config);
       return this;
     }
@@ -66,10 +57,7 @@ Config.prototype = {
     if (this.options.process === true) {
       config = utils.expand(config, utils.extend({}, this.orig, config));
     }
-
-    var task = new Task(name, config, this);
-    utils.set(this.tasks, name, task);
-    return this;
+    return new Task(name, config, this);
   },
 
   set: function (prop, value) {
@@ -88,6 +76,21 @@ Config.prototype = {
   }
 };
 
+function isTask(name, obj) {
+  var keys = ['files', 'src', 'dest', 'options'];
+  if (utils.contains(keys, name)) {
+    return true;
+  }
+  for (var key in obj) {
+    if (utils.contains(keys, key)) {
+      return true;
+    }
+    if (utils.hasValues(obj[key], keys)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 /**
  * Expose `Config`

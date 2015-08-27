@@ -52,6 +52,7 @@ describe('tasks', function () {
       });
 
       assert.deepEqual(task, {
+        taskname: 'task_0',
         options: {cwd: 'foo', ext: '.bar'},
         targets: {
           one: {options: {cwd: 'bar', ext: '.bar' }, files: []},
