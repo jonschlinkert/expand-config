@@ -1,96 +1,41 @@
 'use strict';
 
-var reserved = require('./lib/reserved');
-var utils = require('./lib/utils');
+var clone = require('clone-deep');
+var Base = require('app-base');
+var Node = require('./lib/node');
 var Task = require('./lib/task');
 var Target = require('./lib/target');
+var utils = require('./lib/utils2');
 
-function Config(config) {
-  if (!(this instanceof Config)) {
-    return new Config(config);
-  }
-
-  config = config || {};
-  utils.define(this, 'orig', utils.clone(config));
-  this.options = config.options || {};
+function Config(name, config) {
+  Base.call(this);
+  this.name = name;
+  this.define('orig', clone(config || {}));
+  this.config = {};
   this.tasks = {};
-
-  if (utils.hasValues(config, ['files', 'src', 'dest'])) {
-    this.addTask(config.taskname, config);
-  } else {
-    utils.visit(this, 'addTask', config);
-  }
+  this.targets = {};
+  this.visit('create', config);
 }
 
-Config.prototype = {
-  constructor: Config,
+Base.extend(Config);
 
-  addTask: function (name, config) {
-    if (reserved.all.indexOf(name) < 0) {
-      this.tasks[name] = this.createTask(name, config);
-    }
-    return this;
-  },
-
-  createTask: function (name, config) {
-    if (typeof name === 'string') {
-      this.validate(name);
-    }
-
-    // if it's not a task, just add it to the root
-    if (!isTask(name, config)) {
-      this.set(name, config);
-      return this;
-    }
-
-    if (name === 'options') {
-      this.options = utils.extend({}, config, this.options);
-      return this;
-    }
-
-    if (~reserved.opts.indexOf(name)) {
-      utils.set(this.options, name, config);
-      return this;
-    }
-
-    // resolve config templates after options are set
-    if (this.options.process === true) {
-      config = utils.expand(config, utils.extend({}, this.orig, config));
-    }
-    return new Task(name, config, this);
-  },
-
-  set: function (prop, value) {
-    utils.set(this, prop, value);
-    return this;
-  },
-
-  get: function (prop) {
-    return utils.get(this, prop);
-  },
-
-  validate: function (name) {
-    if (~reserved.methods.indexOf(name)) {
-      throw new Error(name + ' is a reserved root-level property.');
-    }
+Config.prototype.create = function(key, config) {
+  if (utils.isTask(config, key)) {
+    this.tasks[key] = new Task(key, config, this);
+  } else if (utils.isTarget(config, key)) {
+    this.targets[key] = new Target(key, config, this);
+  } else if (utils.isNode(config, key)) {
+    this.config[key] = new Node(config, this);
+  } else {
+    this.config[key] = config;
   }
 };
 
-function isTask(name, obj) {
-  var keys = ['files', 'src', 'dest', 'options'];
-  if (utils.contains(keys, name)) {
-    return true;
-  }
-  for (var key in obj) {
-    if (utils.contains(keys, key)) {
-      return true;
-    }
-    if (utils.hasValues(obj[key], keys)) {
-      return true;
-    }
-  }
-  return false;
-}
+  // validate: function (name) {
+  //   if (~reserved.methods.indexOf(name)) {
+  //     throw new Error(name + ' is a reserved root-level property.');
+  //   }
+  // }
 
 /**
  * Expose `Config`
