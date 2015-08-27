@@ -1,3 +1,11 @@
+'use strict';
+
+var util = require('util');
+var Config = require('./');
+
+var inspect = function (obj) {
+  return util.inspect(obj, null, 10);
+};
 
 var obj = {
   config: {

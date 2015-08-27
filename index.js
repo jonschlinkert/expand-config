@@ -3,9 +3,9 @@
 var clone = require('clone-deep');
 var Base = require('app-base');
 var Node = require('./lib/node');
-var Task = require('./lib/task');
 var Target = require('./lib/target');
-var utils = require('./lib/utils2');
+var Task = require('./lib/task');
+var utils = require('./lib/utils');
 
 function Config(name, config) {
   Base.call(this);
