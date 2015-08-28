@@ -106,6 +106,63 @@ describe('files', function () {
     });
   });
 
+  describe('files objects:', function () {
+    var expected = [{
+      src: ['test/fixtures/a.txt',
+        'test/fixtures/b.txt',
+        'test/fixtures/c.txt',
+        'test/fixtures/d.txt'
+      ],
+      dest: 'foo/',
+      options: {}
+    }, {
+      src: ['test/fixtures/a.txt',
+        'test/fixtures/b.txt',
+        'test/fixtures/c.txt',
+        'test/fixtures/d.txt'
+      ],
+      dest: 'bar/',
+      options: {}
+    }];
+
+    it('should expand files objects when src is a string:', function () {
+      var actual = new Mapping({
+        options: {expand: true},
+        'foo/': 'test/fixtures/*.txt',
+        'bar/': 'test/fixtures/*.txt'
+      });
+      actual.files.should.eql(expected);
+    });
+
+    it('should expand files objects when expand is on options:', function () {
+      var actual = new Mapping({
+        options: {expand: true},
+        'foo/': 'test/fixtures/*.txt',
+        'bar/': 'test/fixtures/*.txt'
+      });
+      actual.files.should.eql(expected);
+    });
+
+
+    it('should expand files objects when expand is on the root:', function () {
+      var actual = new Mapping({
+        expand: true,
+        'foo/': 'test/fixtures/*.txt',
+        'bar/': 'test/fixtures/*.txt'
+      });
+      actual.files.should.eql(expected);
+    });
+
+    it('should expand files objects when src is an array:', function () {
+      var actual = new Mapping({
+        options: {expand: true},
+        'foo/': ['test/fixtures/*.txt'],
+        'bar/': ['test/fixtures/*.txt']
+      });
+      actual.files.should.eql(expected);
+    });
+  });
+
   describe('options.flatten:', function () {
     it('should flatten dest paths:', function () {
       var actual = new Mapping({
