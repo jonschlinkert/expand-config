@@ -3,7 +3,7 @@
 /* deps: mocha */
 var util = require('util');
 var assert = require('assert');
-var utils = require('../utils');
+var utils = require('../lib/utils');
 var Target = require('../lib/target');
 
 var inspect = function(obj) {

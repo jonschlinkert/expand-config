@@ -11,12 +11,31 @@ var inspect = function(obj) {
 
 describe('config', function () {
   describe('constructor', function () {
-    it('should add multiple tasks if passed on the constructor:', function () {
+    it('should add multiple targets if passed on the constructor:', function () {
+      var config = new Config({
+        foo: {src: 'test/fixtures/*.txt'}
+      });
+      config.targets.should.have.property('foo');
+    });
+
+    it('should add a target if passed on the constructor:', function () {
       var config = new Config({
         foo: {src: 'test/fixtures/*.txt'},
         bar: {src: 'test/fixtures/*.txt'}
       });
-      config.tasks.should.have.properties('foo', 'bar');
+      config.targets.should.have.properties('foo', 'bar');
+    });
+
+    it('should add a task if passed on the constructor:', function () {
+      var config = new Config({
+        foo: {
+          one: {src: 'test/fixtures/a/*'},
+          two: {src: 'test/fixtures/b/*'}
+        }
+      });
+      config.tasks.should.have.property('foo');
+      config.tasks.foo.should.have.property('targets');
+      config.tasks.foo.targets.should.have.properties(['one', 'two']);
     });
 
     it('should add multiple tasks if passed on the constructor:', function () {
@@ -44,7 +63,9 @@ describe('config', function () {
           two: {src: '<%= base %>/b/*'}
         }
       });
-      config.tasks.should.have.properties('foo');
+
+      config.should.have.property('options');
+      config.options.should.have.properties(['base', 'process']);
     });
   });
 
@@ -57,23 +78,25 @@ describe('config', function () {
           process: true,
         },
         foo: {
-          one: {src: '<%= base %>/a/*'},
-          two: {src: '<%= base %>/b/*'}
+          one: {src: '<%= base %>/a/*.txt'},
+          two: {src: '<%= base %>/b/*.txt'}
         },
         bar: {
-          one: {src: '<%= base %>/a/*'},
-          two: {src: '<%= base %>/b/*'}
+          one: {src: '<%= options.base %>/a/*.txt'},
+          two: {src: '<%= options.base %>/b/*.txt'}
         }
       });
 
       config.tasks.should.have.properties('foo', 'bar');
       config.tasks.foo.should.have.properties('options', 'targets');
+
       config.tasks.foo.targets.should.have.properties('one', 'two');
       config.tasks.foo.targets.one.should.have.property('files');
 
       var files = config.tasks.foo.targets.one.files;
       assert(Array.isArray(files));
       assert(files.length > 0);
+
       files[0].should.have.property('src');
       files[0].src.should.eql(['test/fixtures/a/a.txt']);
     });

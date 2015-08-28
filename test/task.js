@@ -12,9 +12,9 @@ var inspect = function(obj) {
 
 describe('tasks', function () {
   describe('constructor', function () {
-    it('should set a task `taskname` when passed as the first arg.', function () {
+    it('should set a task `name` when passed as the first arg.', function () {
       var task = new Task('foo', {src: 'a', dest: 'b'});
-      assert.equal(task.taskname, 'foo');
+      assert.equal(task.name, 'foo');
     });
 
     it('should add a parent property if parent is passed:', function () {
@@ -43,20 +43,40 @@ describe('tasks', function () {
     });
 
     it('should separate task options from targets:', function () {
-      var task = new Task({
+      var task = new Task('jshint', {
         options: {cwd: 'foo'},
         ext: '.bar',
         cwd: 'foo',
-        one: {cwd: 'bar'},
-        two: {cwd: 'baz'},
+        one: {cwd: 'bar', src: ''},
+        two: {cwd: 'baz', src: ''},
       });
 
       assert.deepEqual(task, {
-        taskname: 'task_0',
+        name: 'jshint',
         options: {cwd: 'foo', ext: '.bar'},
         targets: {
-          one: {options: {cwd: 'bar', ext: '.bar' }, files: []},
-          two: {options: {cwd: 'baz', ext: '.bar' }, files: []}
+          one: {
+            task: 'jshint',
+            target: 'one',
+            options: {cwd: 'bar', ext: '.bar' },
+            files: [{
+              task: 'jshint',
+              target: 'one',
+              src: '',
+              options: {cwd: 'foo', ext: '.bar' }
+            }]
+          },
+          two: {
+            task: 'jshint',
+            target: 'two',
+            options: {cwd: 'baz', ext: '.bar' },
+            files: [{
+              task: 'jshint',
+              target: 'two',
+              src: '',
+              options: {cwd: 'foo', ext: '.bar' }
+            }]
+          }
         }
       });
     });
@@ -70,17 +90,35 @@ describe('tasks', function () {
       task.options.should.have.property('foo', 'bar');
     });
 
-    it('should not overwrite existing task.options with config options.', function () {
-      var task = {options: {foo: 'bar'}};
-      var task = new Task({
+    it('should not overwrite target.options:', function () {
+      var config = {options: {aaa: 'zzz'}};
+      var task = new Task('assemble', {
+        site: {
+          options: {aaa: 'bbb'},
+          src: 'a',
+          dest: 'b',
+        }
+      }, config);
+
+      task.should.have.property('options');
+      task.options.should.have.property('aaa', 'zzz');
+      task.targets.site.options.should.have.property('aaa', 'bbb');
+    });
+
+    it('should not overwrite options on created targets:', function () {
+      var config = {options: {foo: 'bar'}};
+      var task = new Task('assemble', {
         src: 'a',
         dest: 'b',
         options: {
           foo: 'baz'
         }
-      }, task);
+      }, config);
+
       task.should.have.property('options');
-      task.options.should.have.property('foo', 'baz');
+      task.targets.should.have.property('assemble_0');
+      task.options.should.have.property('foo', 'bar');
+      task.targets.assemble_0.options.should.have.property('foo', 'baz');
     });
   });
 });
