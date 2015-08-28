@@ -200,10 +200,5 @@ var obj = {
 //   }
 // };
 
-// var node = new Node(obj);
-// console.log(node);
-
 var config = new Config('root', obj);
-
-
-console.log(inspect(config));
+console.log(config);
