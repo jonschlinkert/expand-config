@@ -21,28 +21,19 @@
     "test": "mocha"
   },
   "dependencies": {
-    "app-base": "^0.1.0",
+    "app-base": "^0.1.1",
     "clone-deep": "^0.2.2",
-    "collection-visit": "^0.1.1",
-    "define-property": "^0.1.3",
     "expand": "^0.1.2",
-    "extend-shallow": "^2.0.1",
-    "for-own": "^0.1.3",
-    "get-value": "^1.1.5",
     "globby": "^2.1.0",
     "kind-of": "^2.0.1",
-    "lazy-cache": "^0.2.3",
-    "lodash": "^3.10.1",
-    "make-iterator": "^0.2.0",
     "mixin-deep": "^1.1.2",
-    "object.omit": "^2.0.0",
     "object.pick": "^1.1.1",
-    "parse-filepath": "^0.6.3",
-    "set-value": "^0.2.0"
+    "parse-filepath": "^0.6.3"
   },
   "devDependencies": {
-    "mocha": "^2.2.5",
-    "should": "^7.0.4"
+    "extend-shallow": "^2.0.1",
+    "mocha": "*",
+    "should": "*"
   },
   "keywords": [
     "config",
