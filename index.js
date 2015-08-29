@@ -2,12 +2,35 @@
 
 var clone = require('clone-deep');
 var get = require('get-value');
-var Base = require('app-base');
+var Base = require('base-methods');
+var forIn = require('for-in');
+var merge = require('mixin-deep');
 var Target = require('expand-target');
 var Files = require('expand-files');
 var Task = require('expand-task');
 var Node = require('./lib/node');
 var utils = require('./lib/utils');
+
+/**
+ * Expand a declarative configuration with tasks, targets and
+ * files mappings, optionally passing a `name` to register.
+ *
+ * ```js
+ * config('assemble', {
+ *   site: {
+ *     src: 'templates/*.hbs',
+ *     dest: 'site/'
+ *   },
+ *   blog: {
+ *     src: 'content/*.md',
+ *     dest: 'site/blog/'
+ *   }
+ * });
+ * ```
+ *
+ * @param {String} `name`
+ * @param {Object} `config`
+ */
 
 function Config(name, config) {
   if (!(this instanceof Config)) {
@@ -35,7 +58,7 @@ Config.prototype.create = function(key, config) {
   switch(type) {
     case 'options':
       if (key === 'options') {
-        utils.merge(this.options, config);
+        merge(this.options, config);
       } else {
         this.options[key] = config;
       }
@@ -56,6 +79,19 @@ Config.prototype.create = function(key, config) {
   }
 };
 
+/**
+ * Get a task by `name`
+ *
+ * ```js
+ * config.getTask('jshint');
+ * ```
+ *
+ * @param {String} `name`
+ * @param {String} `target` Optionally specify the name of a target to get.
+ * @return {Object} Returns a task or target object
+ * @api public
+ */
+
 Config.prototype.getTask = function(name, target) {
   var task = get(this.tasks, name);
   if (!task) return null;
@@ -65,15 +101,15 @@ Config.prototype.getTask = function(name, target) {
 Config.prototype.toConfig = function() {
   var config = {};
   config.options = this.options;
-  utils.merge(config, this.tasks);
+  merge(config, this.tasks);
 
-  utils.forIn(config, function (val, key) {
+  forIn(config, function (val, key) {
     if (key !== 'options') {
-      utils.merge(val, val.targets);
+      merge(val, val.targets);
       delete val.targets;
     }
   });
-  return config
+  return config;
 };
 
 /**
