@@ -3,8 +3,8 @@
 var util = require('util');
 var assert = require('assert');
 var should = require('should');
+var Mapping = require('expand-files');
 var utils = require('../lib/utils');
-var Mapping = require('../lib/files');
 
 var inspect = function(obj) {
   return util.inspect(obj, null, 10);
@@ -29,14 +29,14 @@ describe('files', function () {
 
     it('should expand `src` glob patterns:', function () {
       var actual = new Mapping({src: 'test/fixtures/*.txt'});
-      assert(utils.contains(actual[0].src, 'test/fixtures/a.txt'));
+      assert.deepEqual(actual[0].src[0], 'test/fixtures/a.txt');
     });
 
     it('should use a `cwd` to expand `src` glob patterns:', function () {
       var actual = new Mapping({src: '*.txt', options: {cwd: 'test/fixtures'}});
-      assert(utils.contains(actual[0].src, 'a.txt'));
-      assert(utils.contains(actual[0].src, 'b.txt'));
-      assert(utils.contains(actual[0].src, 'c.txt'));
+      assert.equal(actual[0].src[0], 'a.txt');
+      assert.equal(actual[0].src[1], 'b.txt');
+      assert.equal(actual[0].src[2], 'c.txt');
     });
   });
 

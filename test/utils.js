@@ -4,20 +4,19 @@
 var util = require('util');
 var assert = require('assert');
 var utils = require('../lib/utils');
-var Target = require('../lib/target');
 
 var inspect = function(obj) {
   return util.inspect(obj, null, 10);
 };
 
 describe('utils', function () {
-  describe('contains', function () {
-    it('should return true if an array contains the given value:', function () {
-      assert(utils.contains(['a', 'b', 'c'], 'a'));
+  describe('.has', function () {
+    it('should return true if an array has the given value:', function () {
+      assert(utils.has(['a', 'b', 'c'], 'a'));
     });
-
-    it('should return false if an array does not contain the given value:', function () {
-      assert(!utils.contains(['a', 'b', 'c'], 'f'));
+    it('should return true if an object has the given key:', function () {
+      assert(utils.has({a: 'b'}, 'a'));
+      assert(!utils.has({a: 'b'}, 'c'));
     });
   });
 });

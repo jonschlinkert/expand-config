@@ -3,8 +3,8 @@
 var util = require('util');
 var assert = require('assert');
 var should = require('should');
+var Task = require('expand-task');
 var utils = require('../lib/utils');
-var Task = require('../lib/task');
 
 var inspect = function(obj) {
   return util.inspect(obj, null, 10);
@@ -47,7 +47,7 @@ describe('tasks', function () {
         options: {cwd: 'foo'},
         ext: '.bar',
         cwd: 'foo',
-        one: {cwd: 'bar', src: ''}
+        one: {cwd: 'bar', src: '*.js'}
       });
       task.targets.one.target.should.equal('one');
     });
@@ -57,8 +57,8 @@ describe('tasks', function () {
         options: {cwd: 'foo'},
         ext: '.bar',
         cwd: 'foo',
-        one: {cwd: 'bar', src: ''},
-        two: {cwd: 'baz', src: ''},
+        one: {cwd: 'bar', src: '*.js'},
+        two: {cwd: 'baz', src: '*.js'},
       });
 
       assert.deepEqual(task, {
@@ -69,7 +69,7 @@ describe('tasks', function () {
             files: [{
               task: 'jshint',
               target: 'one',
-              src: '',
+              src: [],
               options: {cwd: 'foo', ext: '.bar' }
             }]
           },
@@ -78,7 +78,7 @@ describe('tasks', function () {
             files: [{
               task: 'jshint',
               target: 'two',
-              src: '',
+              src: [],
               options: {cwd: 'foo', ext: '.bar' }
             }]
           }
@@ -136,7 +136,7 @@ describe('tasks', function () {
       }, config);
 
       var keys = Object.keys(task.targets);
-      keys[0].should.match(/assemble_\d/);
+      keys[0].should.match(/assemble\d/);
       task.targets[keys[0]].options.should.have.property('foo', 'baz');
     });
   });

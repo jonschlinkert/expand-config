@@ -98,7 +98,7 @@ describe('config', function () {
       assert(files.length > 0);
 
       files[0].should.have.property('src');
-      files[0].src.should.eql(['test/fixtures/a/a.txt']);
+      files[0].src[0].should.equal('test/fixtures/a/a.txt');
     });
   });
 });

@@ -3,8 +3,8 @@
 var util = require('util');
 var assert = require('assert');
 var should = require('should');
+var Target = require('expand-target');
 var utils = require('../lib/utils');
-var Target = require('../lib/target');
 
 var inspect = function(obj) {
   return util.inspect(obj, null, 10);
@@ -96,14 +96,14 @@ describe('targets', function () {
 
     it('should expand `src` glob patterns:', function () {
       var target = new Target({src: 'test/fixtures/*.txt'});
-      assert(utils.contains(target.files[0].src, 'test/fixtures/a.txt'));
+      assert.equal(target.files[0].src[0], 'test/fixtures/a.txt');
     });
 
     it('should use a `cwd` to expand `src` glob patterns:', function () {
       var target = new Target({src: '*.txt', cwd: 'test/fixtures'});
-      assert(utils.contains(target.files[0].src, 'a.txt'));
-      assert(utils.contains(target.files[0].src, 'b.txt'));
-      assert(utils.contains(target.files[0].src, 'c.txt'));
+      assert.equal(target.files[0].src[0], 'a.txt');
+      assert.equal(target.files[0].src[1], 'b.txt');
+      assert.equal(target.files[0].src[2], 'c.txt');
     });
   });
 
@@ -130,9 +130,9 @@ describe('targets', function () {
     describe('when expand is true', function () {
       it('should join the `cwd` to expanded `src` paths:', function () {
         var target = new Target({src: '*.txt', cwd: 'test/fixtures', expand: true});
-        assert(utils.contains(target.files[0].src, 'test/fixtures/a.txt'));
-        assert(utils.contains(target.files[1].src, 'test/fixtures/b.txt'));
-        assert(utils.contains(target.files[2].src, 'test/fixtures/c.txt'));
+        assert.equal(target.files[0].src[0], 'test/fixtures/a.txt');
+        assert.equal(target.files[1].src[0], 'test/fixtures/b.txt');
+        assert.equal(target.files[2].src[0], 'test/fixtures/c.txt');
       });
 
       it('should create `dest` properties using the src path:', function () {
@@ -166,7 +166,7 @@ describe('targets', function () {
 
       it('should expand `src-dest` mappings:', function () {
         var target = new Target({src: 'test/fixtures/*.txt'});
-        assert(utils.contains(target.files[0].src, 'test/fixtures/a.txt'));
+        assert.equal(target.files[0].src[0], 'test/fixtures/a.txt');
       });
     });
   });

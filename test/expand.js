@@ -5,8 +5,8 @@ var util = require('util');
 var assert = require('assert');
 var should = require('should');
 var extend = require('extend-shallow');
+var Mapping = require('expand-files');
 var expand = require('expand');
-var Mapping = require('../lib/files');
 
 var inspect = function (obj) {
   return util.inspect(obj, null, 10);
