@@ -5,7 +5,7 @@ var inspect = function (obj) {
   return util.inspect(obj, null, 10);
 };
 
-var target = new Target('assemble', {
+var config = new Target('assemble', {
   expand: true,
   dest: 'foo/',
   src: '{.*,*.*}'
@@ -13,74 +13,78 @@ var target = new Target('assemble', {
 
 console.log(target.config.files)
 
-// // var a = target('foo', {
-// //   src: 'test/fixtures/*.js',
-// //   dest: 'site/assets/'
-// // });
-// // console.log(inspect(a));
+var config = new Target('example', {
+  src: 'test/fixtures/*.js',
+  dest: 'site/assets/'
+});
+console.log(inspect(config))
 
 
-// var b = new Target('foo', {
-//   // flatten: true,
-//   // expand: true,
-//   files: [
-//     // {src: 'test/fixtures/*.txt', dest: 'site/assets/'},
-//     {src: ['test/fixtures/*.js', 'test/fixtures/*.txt'], dest: 'site/assets/'}
-//   ]
-// });
-// console.log(inspect(b));
+var config = new Target('example', {
+  flatten: true,
+  expand: true,
+  files: [
+    {src: 'test/fixtures/*.txt', dest: 'site/assets/'},
+    {src: ['test/fixtures/*.js', 'test/fixtures/*.txt'], dest: 'site/assets/'}
+  ]
+});
+console.log(inspect(config))
 
-// // var c = target('foo', {
-// //   files: [
-// //     {src: 'test/fixtures/*.js', dest: 'site/assets/'},
-// //     {src: 'test/fixtures/*.js', dest: 'site/assets/'},
-// //     {src: 'test/fixtures/*.js', dest: 'site/assets/'},
-// //   ]
-// // });
-// // console.log(inspect(c));
+var config = new Target('example', {
+  files: [
+    {src: 'test/fixtures/*.js', dest: 'site/assets/'},
+    {src: 'test/fixtures/*.js', dest: 'site/assets/'},
+    {src: 'test/fixtures/*.js', dest: 'site/assets/'},
+  ]
+});
+console.log(inspect(config))
 
-// // var d = target('foo', {
-// //   cwd: 'test/fixtures',
-// //   files: [
-// //     {src: '*.js', dest: 'site/assets/'},
-// //     {src: '*.js', dest: 'site/assets/'},
-// //     {src: '*.js', dest: 'site/assets/'},
-// //   ]
-// // });
-// // console.log(inspect(d));
+var config = new Target('example', {
+  cwd: 'test/fixtures',
+  files: [
+    {src: '*.js', dest: 'site/a/'},
+    {src: '*.js', dest: 'site/b/'},
+    {src: '*.js', dest: 'site/c/'},
+  ]
+});
+console.log(inspect(config))
 
-// // var e = target('foo', {
-// //   cwd: 'test/fixtures',
-// //   expand: true,
-// //   files: [
-// //     {src: '*.js', dest: 'site/assets/'},
-// //     {src: '*.js', dest: 'site/assets/'},
-// //     {src: '*.js', dest: 'site/assets/'},
-// //   ]
-// // });
-// // console.log(inspect(e));
+var config = new Target('example', {
+  cwd: 'test/fixtures',
+  expand: true,
+  files: [
+    {src: '*.js', dest: 'site/assets/'},
+    {src: '*.js', dest: 'site/assets/'},
+    {src: '*.js', dest: 'site/assets/'},
+  ]
+});
+console.log(inspect(config))
 
-// // var f = target('foo', {
-// //   options: {
-// //     cwd: 'test/fixtures',
-// //     expand: true,
-// //   },
-// //   files: [
-// //     {src: '*.js', dest: 'site/assets/'},
-// //     {src: '*.js', dest: 'site/assets/'},
-// //     {src: '*.js', dest: 'site/assets/'},
-// //   ]
-// // });
-// // console.log(inspect(f));
-
-
-// var g = new Target('foo', {
-//   expand: true,
-//   files: {
-//     'dotfiles/': ['.*'],
-//     'site/assets/': ['test/fixtures/*.js'],
-//   }
-// });
+var config = new Target('example', {
+  options: {
+    cwd: 'test/fixtures',
+    expand: true,
+  },
+  files: [
+    {src: '*.js', dest: 'site/assets/'},
+    {src: '*.js', dest: 'site/assets/'},
+    {src: '*.js', dest: 'site/assets/'},
+  ]
+});
+console.log(inspect(config))
 
 
-// // console.log(inspect(b));
+var config = new Target('example', {
+  files: {
+    'foo/': ['*.js'],
+  }
+});
+
+var config = new Target('example', {
+  expand: true,
+  files: {
+    'foo/': ['*.js'],
+  }
+});
+
+console.log(inspect(config))

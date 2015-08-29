@@ -60,4 +60,7 @@ var config = new Config({
     }
   }
 });
-console.log(inspect(config));
+// console.log(inspect(config));
+
+// console.log(config.getTask('assemble'))
+console.log(config.toConfig())

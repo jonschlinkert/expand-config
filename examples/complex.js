@@ -170,15 +170,15 @@ var target = new Target({
 
 console.log(target)
 
-app.task(target.name, target.options, function () {
-  return app.src(target.src)
-    .pipe(target.pipeline)
-    .pipe(app.dest(target.dest))
-});
+// app.task(target.name, target.options, function () {
+//   return app.src(target.src)
+//     .pipe(target.pipeline)
+//     .pipe(app.dest(target.dest))
+// });
 
-if (target.run) {
-  app.run.apply(app, target.run);
-}
+// if (target.run) {
+//   app.run.apply(app, target.run);
+// }
 
 // var config = new Config(tasks);
 // // var docs = config.task('assemble.docs');
