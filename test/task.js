@@ -42,6 +42,16 @@ describe('tasks', function () {
       assert.deepEqual(task.options, {cwd: 'foo', ext: '.bar'});
     });
 
+    it('should add a non-enumerable `target` name to the target:', function () {
+      var task = new Task('jshint', {
+        options: {cwd: 'foo'},
+        ext: '.bar',
+        cwd: 'foo',
+        one: {cwd: 'bar', src: ''}
+      });
+      task.targets.one.target.should.equal('one');
+    });
+
     it('should separate task options from targets:', function () {
       var task = new Task('jshint', {
         options: {cwd: 'foo'},
@@ -52,12 +62,9 @@ describe('tasks', function () {
       });
 
       assert.deepEqual(task, {
-        name: 'jshint',
         options: {cwd: 'foo', ext: '.bar'},
         targets: {
           one: {
-            task: 'jshint',
-            target: 'one',
             options: {cwd: 'bar', ext: '.bar' },
             files: [{
               task: 'jshint',
@@ -67,8 +74,6 @@ describe('tasks', function () {
             }]
           },
           two: {
-            task: 'jshint',
-            target: 'two',
             options: {cwd: 'baz', ext: '.bar' },
             files: [{
               task: 'jshint',
@@ -115,10 +120,24 @@ describe('tasks', function () {
         }
       }, config);
 
+      task.should.have.property('name');
       task.should.have.property('options');
-      task.targets.should.have.property('assemble_0');
       task.options.should.have.property('foo', 'bar');
-      task.targets.assemble_0.options.should.have.property('foo', 'baz');
+    });
+
+    it('should auto-generate target names for anonymous targets:', function () {
+      var config = {options: {foo: 'bar'}};
+      var task = new Task('assemble', {
+        src: 'a',
+        dest: 'b',
+        options: {
+          foo: 'baz'
+        }
+      }, config);
+
+      var keys = Object.keys(task.targets);
+      keys[0].should.match(/assemble_\d/);
+      task.targets[keys[0]].options.should.have.property('foo', 'baz');
     });
   });
 });

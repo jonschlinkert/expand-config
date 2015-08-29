@@ -12,27 +12,31 @@ var inspect = function(obj) {
 
 describe('files', function () {
   describe('expand', function () {
-    it('should return a node when no `src` exists', function () {
+    it('should create a node when no `src` exists', function () {
       var actual = new Mapping({foo: 'bar'});
-      assert.deepEqual(actual, {foo: 'bar', options: {}});
+      assert.deepEqual(actual, [{
+        options: {},
+        dest: 'foo',
+        src: []
+      }]);
     });
 
     it('should arrayify the `src` property', function () {
       var actual = new Mapping({src: 'a', dest: 'b'});
-      actual.should.have.property('src');
-      assert(Array.isArray(actual.src));
+      actual[0].should.have.property('src');
+      assert(Array.isArray(actual[0].src));
     });
 
     it('should expand `src` glob patterns:', function () {
       var actual = new Mapping({src: 'test/fixtures/*.txt'});
-      assert(utils.contains(actual.src, 'test/fixtures/a.txt'));
+      assert(utils.contains(actual[0].src, 'test/fixtures/a.txt'));
     });
 
     it('should use a `cwd` to expand `src` glob patterns:', function () {
       var actual = new Mapping({src: '*.txt', options: {cwd: 'test/fixtures'}});
-      assert(utils.contains(actual.src, 'a.txt'));
-      assert(utils.contains(actual.src, 'b.txt'));
-      assert(utils.contains(actual.src, 'c.txt'));
+      assert(utils.contains(actual[0].src, 'a.txt'));
+      assert(utils.contains(actual[0].src, 'b.txt'));
+      assert(utils.contains(actual[0].src, 'c.txt'));
     });
   });
 
@@ -107,23 +111,16 @@ describe('files', function () {
   });
 
   describe('files objects:', function () {
-    var expected = [{
-      src: ['test/fixtures/a.txt',
-        'test/fixtures/b.txt',
-        'test/fixtures/c.txt',
-        'test/fixtures/d.txt'
-      ],
-      dest: 'foo/',
-      options: {}
-    }, {
-      src: ['test/fixtures/a.txt',
-        'test/fixtures/b.txt',
-        'test/fixtures/c.txt',
-        'test/fixtures/d.txt'
-      ],
-      dest: 'bar/',
-      options: {}
-    }];
+    var expected = [
+      {src: ['test/fixtures/a.txt'], dest: 'foo/test/fixtures/a.txt'},
+      {src: ['test/fixtures/b.txt'], dest: 'foo/test/fixtures/b.txt'},
+      {src: ['test/fixtures/c.txt'], dest: 'foo/test/fixtures/c.txt'},
+      {src: ['test/fixtures/d.txt'], dest: 'foo/test/fixtures/d.txt'},
+      {src: ['test/fixtures/a.txt'], dest: 'bar/test/fixtures/a.txt'},
+      {src: ['test/fixtures/b.txt'], dest: 'bar/test/fixtures/b.txt'},
+      {src: ['test/fixtures/c.txt'], dest: 'bar/test/fixtures/c.txt'},
+      {src: ['test/fixtures/d.txt'], dest: 'bar/test/fixtures/d.txt'}
+    ];
 
     it('should expand files objects when src is a string:', function () {
       var actual = new Mapping({
@@ -131,7 +128,7 @@ describe('files', function () {
         'foo/': 'test/fixtures/*.txt',
         'bar/': 'test/fixtures/*.txt'
       });
-      actual.files.should.eql(expected);
+      actual.should.eql(expected);
     });
 
     it('should expand files objects when expand is on options:', function () {
@@ -140,9 +137,8 @@ describe('files', function () {
         'foo/': 'test/fixtures/*.txt',
         'bar/': 'test/fixtures/*.txt'
       });
-      actual.files.should.eql(expected);
+      actual.should.eql(expected);
     });
-
 
     it('should expand files objects when expand is on the root:', function () {
       var actual = new Mapping({
@@ -150,16 +146,16 @@ describe('files', function () {
         'foo/': 'test/fixtures/*.txt',
         'bar/': 'test/fixtures/*.txt'
       });
-      actual.files.should.eql(expected);
+      actual.should.eql(expected);
     });
 
-    it('should expand files objects when src is an array:', function () {
+    it('should expand files objects when `src` is an array:', function () {
       var actual = new Mapping({
         options: {expand: true},
         'foo/': ['test/fixtures/*.txt'],
         'bar/': ['test/fixtures/*.txt']
       });
-      actual.files.should.eql(expected);
+      actual.should.eql(expected);
     });
   });
 
