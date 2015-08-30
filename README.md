@@ -1,6 +1,6 @@
 # expand-config [![NPM version](https://badge.fury.io/js/expand-config.svg)](http://badge.fury.io/js/expand-config)
 
-> Expand tasks, targets and options in a declarative configuraiton.
+> Expand tasks, targets and files in a declarative configuration.
 
 ## TOC
 
