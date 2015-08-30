@@ -14,7 +14,7 @@ describe('targets', function () {
   describe('constructor', function () {
     it('should set a target `name` when passed as the first arg.', function () {
       var target = new Target('foo', {src: 'a', dest: 'b'});
-      assert.equal(target.target, 'foo');
+      assert.equal(target.name, 'foo');
     });
 
     it('should add a parent property if parent is passed:', function () {
@@ -122,7 +122,7 @@ describe('targets', function () {
 
       target.files[0].should.have.property('options');
       target.files[0].should.have.property('task', 'jshint');
-      target.files[0].should.have.property('target', 'lib');
+      target.files[0].should.have.property('name', 'lib');
     });
   });
 
