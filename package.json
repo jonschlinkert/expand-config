@@ -1,7 +1,7 @@
 {
   "name": "expand-config",
-  "description": "Normalize tasks, targets and options in a declarative configuraiton.",
-  "version": "0.3.1",
+  "description": "Expand tasks, targets and options in a declarative configuraiton.",
+  "version": "0.1.1",
   "homepage": "https://github.com/jonschlinkert/expand-config",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "jonschlinkert/expand-config",
@@ -21,19 +21,22 @@
     "test": "mocha"
   },
   "dependencies": {
-    "app-base": "^0.1.1",
+    "base-methods": "^0.2.1",
     "clone-deep": "^0.2.2",
     "expand": "^0.1.2",
-    "globby": "^2.1.0",
+    "expand-files": "^0.1.2",
+    "expand-target": "^0.1.2",
+    "expand-task": "^0.1.1",
+    "for-in": "^0.1.4",
+    "get-value": "^1.1.5",
     "kind-of": "^2.0.1",
-    "mixin-deep": "^1.1.2",
-    "object.pick": "^1.1.1",
-    "parse-filepath": "^0.6.3"
+    "mixin-deep": "^1.1.3"
   },
   "devDependencies": {
     "extend-shallow": "^2.0.1",
     "mocha": "*",
-    "should": "*"
+    "should": "*",
+    "stringify-object": "^2.3.0"
   },
   "keywords": [
     "config",
@@ -54,13 +57,19 @@
   "verb": {
     "related": {
       "list": [
-        "expander",
-        "expand-object",
-        "expand-config"
+        "files-objects",
+        "expand-config",
+        "expand-files",
+        "expand-task",
+        "expand-target"
       ]
     },
     "reflinks": {
-      "list": "expander"
+      "list": [
+        "expander",
+        "grunt",
+        "verb"
+      ]
     }
   }
 }
