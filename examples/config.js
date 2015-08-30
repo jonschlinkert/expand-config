@@ -1,66 +1,29 @@
+var stringify = require('stringify-object');
 var util = require('util');
-var Task = require('../lib/task');
 var Config = require('../');
 
-var inspect = function(obj) {
-  return util.inspect(obj, null, 10);
-};
+function config(obj) {
+  var res = stringify(new Config(obj), {
+    singleQuotes: true,
+    indent: '  '
+  });
+  console.log(res);
+}
 
-// var config = require('..')({
-//   lint: {
-//     options: {expand: true},
-//     foo: {src: '*.js'},
-//     bar: {src: '*.js'}
-//   },
-//   copy: {
-//     foo: {src: '*.js'},
-//     bar: {src: '*.js'}
-//   }
-// });
-// console.log(inspect(config));
-
-// { options: {},
-//   tasks:
-//    { lint:
-//       { options: {},
-//         targets:
-//          { foo:
-//             { options: {},
-//               files:
-//                [ { taskname: 'lint',
-//                    targetname: 'foo',
-//                    options: {},
-//                    src: [ 'index.js' ] } ] },
-//            bar:
-//             { options: {},
-//               files:
-//                [ { taskname: 'lint',
-//                    targetname: 'bar',
-//                    options: {},
-//                    src: [ 'index.js' ] } ] } },
-//         taskname: 'lint' } } }
-
-
-
-var config = new Config({
+config({
+  // foo: 'test/fixtures',
+  foo: 'a',
   options: {process: true},
-  source: {
-    site: 'src/site',
-  },
   assemble: {
-    cwd: 'foo',
+    foo: 'c',
     site: {
-      options: { process: 'config' },
-      xyz: 'yyy',
-      abc: '<%= options.cwd %>/',
-      src: 'test/fixtures/*.js'
+      foo: 'd',
+      src: '<%= foo %>/*.js',
+      dest: '<%= foo %>/site'
     },
     blog: {
-      src: 'test/fixtures/*.txt'
+      src: '<%= foo %>/*.txt',
+      dest: '<%= foo %>/site/blog'
     }
   }
 });
-// console.log(inspect(config));
-
-// console.log(config.getTask('assemble'))
-console.log(config.toConfig())
