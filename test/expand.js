@@ -12,6 +12,11 @@ var inspect = function (obj) {
   return util.inspect(obj, null, 10);
 };
 
+/**
+ * Some of these unit tests are based on the tests in `grunt.file`
+ * https://github.com/gruntjs/grunt/blob/master/LICENSE-MIT
+ */
+
 describe('expand mapping:', function () {
   var actual, expected;
 
