@@ -10,6 +10,20 @@ var inspect = function(obj) {
   return util.inspect(obj, null, 10);
 };
 
+function containEql(actual, expected) {
+  var len = expected.length;
+  var alen = actual.length;
+  len = Math.min(len, alen);
+
+  while (len--) {
+    var a = actual[len];
+    var b = expected[len];
+
+    a.src.should.eql(b.src);
+    a.dest.should.equal(b.dest);
+  }
+}
+
 describe('targets', function () {
   describe('constructor', function () {
     it('should set a target `name` when passed as the first arg.', function () {
@@ -121,8 +135,7 @@ describe('targets', function () {
       }, {task: 'jshint'});
 
       target.files[0].should.have.property('options');
-      target.files[0].should.have.property('task', 'jshint');
-      target.files[0].should.have.property('name', 'lib');
+      target.files[0].options.should.have.properties('expand', 'aaa');
     });
   });
 
@@ -142,26 +155,24 @@ describe('targets', function () {
 
       it('should expand `src` paths to src-dest mappings:', function () {
         var target = new Target({src: 'test/fixtures/*.txt', expand: true});
-        target.files.should.containEql({
-          src: [ 'test/fixtures/a.txt' ],
+        containEql(target.files, [{
+          src: ['test/fixtures/a.txt'],
           dest: 'test/fixtures/a.txt'
-        });
-        target.files.should.containEql({
-          src: [ 'test/fixtures/b.txt' ],
+        }, {
+          src: ['test/fixtures/b.txt'],
           dest: 'test/fixtures/b.txt'
-        });
+        }]);
       });
 
       it('should strip cwd from dest mappings:', function () {
         var target = new Target({src: '*.txt', cwd: 'test/fixtures', expand: true});
-        target.files.should.containEql({
-          src: [ 'test/fixtures/a.txt' ],
+        containEql(target.files, [{
+          src: ['test/fixtures/a.txt'],
           dest: 'a.txt'
-        });
-        target.files.should.containEql({
-          src: [ 'test/fixtures/b.txt' ],
+        }, {
+          src: ['test/fixtures/b.txt'],
           dest: 'b.txt'
-        });
+        }]);
       });
 
       it('should expand `src-dest` mappings:', function () {
