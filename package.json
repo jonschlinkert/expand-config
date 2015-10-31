@@ -1,7 +1,7 @@
 {
   "name": "expand-config",
   "description": "Expand tasks, targets and files in a declarative configuration.",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "homepage": "https://github.com/jonschlinkert/expand-config",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "jonschlinkert/expand-config",
@@ -21,20 +21,20 @@
     "test": "mocha"
   },
   "dependencies": {
-    "base-methods": "^0.2.1",
-    "clone-deep": "^0.2.2",
-    "expand-files": "^0.2.0",
-    "expand-target": "^0.2.0",
-    "expand-task": "^0.2.0",
+    "base-methods": "^0.4.0",
+    "clone-deep": "^0.2.3",
+    "expand-files": "^0.5.0",
+    "expand-target": "^0.3.0",
+    "expand-task": "^0.3.0",
     "for-in": "^0.1.4",
-    "get-value": "^1.1.5",
+    "get-value": "^2.0.0",
     "kind-of": "^2.0.1",
     "mixin-deep": "^1.1.3"
   },
   "devDependencies": {
     "mocha": "*",
     "should": "*",
-    "stringify-object": "^2.3.0"
+    "stringify-object": "jonschlinkert/stringify-object"
   },
   "keywords": [
     "config",
