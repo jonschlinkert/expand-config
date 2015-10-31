@@ -115,9 +115,9 @@ describe('targets', function () {
 
     it('should use a `cwd` to expand `src` glob patterns:', function () {
       var target = new Target({src: '*.txt', cwd: 'test/fixtures'});
-      assert.equal(target.files[0].src[0], 'a.txt');
-      assert.equal(target.files[0].src[1], 'b.txt');
-      assert.equal(target.files[0].src[2], 'c.txt');
+      assert.equal(target.files[0].src[0], 'test/fixtures/a.txt');
+      assert.equal(target.files[0].src[1], 'test/fixtures/b.txt');
+      assert.equal(target.files[0].src[2], 'test/fixtures/c.txt');
     });
   });
 

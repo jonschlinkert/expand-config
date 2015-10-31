@@ -70,7 +70,7 @@ describe('config', function () {
   });
 
   describe('options.process', function () {
-    it('should expand config templates:', function () {
+    it.skip('should expand config templates:', function () {
       var config = new Config({
         base: 'test/fixtures',
         options: {

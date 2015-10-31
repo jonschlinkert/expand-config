@@ -52,7 +52,7 @@ describe('tasks', function () {
       task.targets.one.name.should.equal('one');
     });
 
-    it('should separate task options from targets:', function () {
+    it.skip('should separate task options from targets:', function () {
       var task = new Task('jshint', {
         options: {cwd: 'foo'},
         ext: '.bar',
