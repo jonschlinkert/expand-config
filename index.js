@@ -1,115 +1,149 @@
 'use strict';
 
-var clone = require('clone-deep');
-var get = require('get-value');
-var Base = require('base-methods');
-var forIn = require('for-in');
-var merge = require('mixin-deep');
-var Target = require('expand-target');
-var Files = require('expand-files');
-var Task = require('expand-task');
-var Node = require('./lib/node');
-var utils = require('./lib/utils');
+var util = require('expand-utils');
+var utils = require('./utils');
+var use = require('use');
 
 /**
- * Expand a declarative configuration with tasks, targets and
- * files mappings, optionally passing a `name` to register.
+ * Expand a declarative configuration with tasks and targets.
+ * Create a new Config with the given `options`
  *
  * ```js
- * config('assemble', {
- *   site: {
- *     src: 'templates/*.hbs',
- *     dest: 'site/'
- *   },
- *   blog: {
- *     src: 'content/*.md',
- *     dest: 'site/blog/'
+ * var config = new Config();
+ *
+ * // example usage
+ * config.expand({
+ *   jshint: {
+ *     src: ['*.js', 'lib/*.js']
  *   }
  * });
  * ```
- *
- * @param {String} `name`
- * @param {Object} `config`
+ * @param {Object} `options`
+ * @api public
  */
 
-function Config(name, config) {
+function Config(options) {
   if (!(this instanceof Config)) {
-    return new Config(config);
+    return new Config(options);
   }
-  Base.call(this);
-  if (typeof name !== 'string') {
-    config = name;
-    name = 'root';
-  }
-  this.define('name', name);
-  this.define('orig', clone(config || {}));
-  this.options = {};
-  this.config = {};
-  this.tasks = {};
+
+  utils.define(this, '_name', 'Config');
+  utils.define(this, 'isConfig', true);
+  utils.define(this, 'count', 0);
+  use(this);
+
+  this.options = options || {};
   this.targets = {};
-  this.visit('create', config);
+  this.tasks = {};
+
+  if (util.isConfig(options)) {
+    this.options = {};
+    this.expand(options);
+    return this;
+  }
 }
 
-Base.extend(Config);
+/**
+ * Expand and normalize a declarative configuration into tasks, targets,
+ * and `options`.
+ *
+ * ```js
+ * config.expand({
+ *   options: {},
+ *   assemble: {
+ *     site: {
+ *       mapDest: true,
+ *       src: 'templates/*.hbs',
+ *       dest: 'site/'
+ *     },
+ *     docs: {
+ *       src: 'content/*.md',
+ *       dest: 'site/docs/'
+ *     }
+ *   }
+ * });
+ * ```
+ * @param {Object} `config` Config object with tasks and/or targets.
+ * @return {Object}
+ * @api public
+ */
 
-Config.prototype.create = function(key, config) {
-  var type = utils.isType(config, key);
+Config.prototype.expand = function(config) {
+  if (util.isTarget(config)) {
+    this.addTarget('target' + (this.count++), config);
+    return this;
+  }
 
-  switch(type) {
-    case 'options':
-      if (key === 'options') {
-        merge(this.options, config);
-      } else {
-        this.options[key] = config;
-      }
-      break;
-    case 'task':
-      this.tasks[key] = new Task(key, config, this);
-      break;
-    case 'target':
-      this.targets[key] = new Target(key, config, this);
-      break;
-    case 'node':
-      this.config[key] = new Node(config, this);
-      break;
-    default: {
-      this.config[key] = config;
-      break;
+  for (var key in config) {
+    var val = config[key];
+
+    if (util.isTask(val)) {
+      this.addTask(key, val);
+
+    } else if (util.isTarget(val)) {
+      this.addTarget(key, val);
+
+    } else {
+      this[key] = val;
     }
   }
 };
 
 /**
- * Get a task by `name`
+ * Add a task to the config, while also normalizing targets with src-dest mappings and
+ * expanding glob patterns in each target.
  *
  * ```js
- * config.getTask('jshint');
+ * task.addTask('assemble', {
+ *   site: {src: '*.hbs', dest: 'templates/'},
+ *   docs: {src: '*.md', dest: 'content/'}
+ * });
  * ```
- *
- * @param {String} `name`
- * @param {String} `target` Optionally specify the name of a target to get.
- * @return {Object} Returns a task or target object
+ * @param {String} `name` the task's name
+ * @param {Object} `config` Task object where each key is a target or `options`.
+ * @return {Object}
  * @api public
  */
 
-Config.prototype.getTask = function(name, target) {
-  var task = get(this.tasks, name);
-  if (!task) return null;
-  return target ? task.getTarget(target) : task;
+Config.prototype.addTask = function(name, config) {
+  if (typeof name !== 'string') {
+    throw new TypeError('Config#addTask expects name to be a string');
+  }
+  var task = new utils.Task(this.options);
+  utils.define(task, 'name', name);
+
+  util.run(this, 'task', task);
+  task.addTargets(config);
+
+  this.tasks[name] = task;
+  return task;
 };
 
-Config.prototype.toConfig = function() {
-  var config = {};
-  config.options = this.options;
-  merge(config, this.tasks);
+/**
+ * Add a target to the config, while also normalizing src-dest mappings and
+ * expanding glob patterns in the target.
+ *
+ * ```js
+ * config.addTarget({src: '*.hbs', dest: 'templates/'});
+ * ```
+ * @param {String} `name` The target's name
+ * @param {Object} `target` Target object with a `files` property, or `src` and optionally a `dest` property.
+ * @return {Object}
+ * @api public
+ */
 
-  forIn(config, function (val, key) {
-    if (key !== 'options') {
-      merge(val, val.targets);
-      delete val.targets;
-    }
-  });
-  return config;
+Config.prototype.addTarget = function(name, config) {
+  if (typeof name !== 'string') {
+    throw new TypeError('Config#addTarget expects name to be a string');
+  }
+  var target = new utils.Target(this.options);
+  utils.define(target, 'name', name);
+
+  util.run(this, 'target', target);
+  target.addFiles(config);
+
+  this.targets[name] = target;
+  return target;
 };
 
 /**
@@ -117,12 +151,3 @@ Config.prototype.toConfig = function() {
  */
 
 module.exports = Config;
-
-/**
- * Expose constructors
- */
-
-module.exports.Task = Task;
-module.exports.Target = Target;
-module.exports.Files = Files;
-module.exports.Node = Node;
