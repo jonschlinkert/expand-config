@@ -1,7 +1,7 @@
 {
   "name": "expand-config",
   "description": "Expand tasks, targets and files in a declarative configuration.",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "homepage": "https://github.com/jonschlinkert/expand-config",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "jonschlinkert/expand-config",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "define-property": "^0.2.5",
-    "expand-target": "^0.5.0",
+    "expand-target": "^0.5.1",
     "expand-task": "^0.3.1",
     "expand-utils": "^0.1.1",
     "lazy-cache": "^0.2.4",
