@@ -75,16 +75,18 @@ Config.prototype.expand = function(config) {
   }
 
   for (var key in config) {
-    var val = config[key];
+    if (config.hasOwnProperty(key)) {
+      var val = config[key];
 
-    if (util.isTask(val)) {
-      this.addTask(key, val);
+      if (util.isTask(val)) {
+        this.addTask(key, val);
 
-    } else if (util.isTarget(val)) {
-      this.addTarget(key, val);
+      } else if (util.isTarget(val)) {
+        this.addTarget(key, val);
 
-    } else {
-      this[key] = val;
+      } else {
+        this[key] = val;
+      }
     }
   }
 };
