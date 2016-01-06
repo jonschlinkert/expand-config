@@ -22,10 +22,9 @@
   },
   "dependencies": {
     "define-property": "^0.2.5",
-    "expand-target": "^0.5.1",
-    "expand-task": "^0.3.1",
-    "expand-utils": "^0.1.1",
-    "lazy-cache": "^0.2.4",
+    "expand-target": "^0.5.3",
+    "expand-task": "^0.3.3",
+    "expand-utils": "^0.1.4",
     "use": "^1.1.2"
   },
   "devDependencies": {
@@ -51,12 +50,12 @@
   "verb": {
     "related": {
       "list": [
-        "files-objects",
         "expand-config",
         "expand-files",
-        "expand-task",
         "expand-target",
+        "expand-task",
         "expand-utils",
+        "files-objects",
         "normalize-config"
       ]
     },
@@ -66,6 +65,9 @@
         "grunt",
         "verb"
       ]
-    }
+    },
+    "plugins": [
+      "gulp-format-md"
+    ]
   }
 }
