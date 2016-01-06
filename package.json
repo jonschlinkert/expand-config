@@ -61,8 +61,15 @@
     },
     "reflinks": {
       "list": [
+        "expand-config",
+        "expand-files",
+        "expand-target",
+        "expand-task",
+        "expand-utils",
         "expander",
+        "files-objects",
         "grunt",
+        "normalize-config",
         "verb"
       ]
     },

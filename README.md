@@ -151,7 +151,7 @@ Visit [expand-target](https://github.com/jonschlinkert/expand-target) to see the
 
 ### Files
 
-Visit [expand-files][] to see the docs and full range of options for files expansion.
+Visit [expand-files](https://github.com/jonschlinkert/expand-files) to see the docs and full range of options for files expansion.
 
 ## Related projects
 
