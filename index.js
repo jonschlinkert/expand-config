@@ -1,7 +1,9 @@
 'use strict';
 
-var util = require('expand-utils');
-var utils = require('./utils');
+var utils = require('expand-utils');
+var define = require('define-property');
+var Target = require('expand-target');
+var Task = require('expand-task');
 var use = require('use');
 
 /**
@@ -27,16 +29,15 @@ function Config(options) {
     return new Config(options);
   }
 
-  utils.define(this, '_name', 'Config');
-  utils.define(this, 'isConfig', true);
-  utils.define(this, 'count', 0);
+  utils.is(this, 'config');
   use(this);
 
+  define(this, 'count', 0);
   this.options = options || {};
   this.targets = {};
   this.tasks = {};
 
-  if (util.isConfig(options)) {
+  if (utils.isConfig(options)) {
     this.options = {};
     this.expand(options);
     return this;
@@ -69,7 +70,7 @@ function Config(options) {
  */
 
 Config.prototype.expand = function(config) {
-  if (util.isTarget(config)) {
+  if (utils.isTarget(config)) {
     this.addTarget('target' + (this.count++), config);
     return this;
   }
@@ -78,10 +79,10 @@ Config.prototype.expand = function(config) {
     if (config.hasOwnProperty(key)) {
       var val = config[key];
 
-      if (util.isTask(val)) {
+      if (utils.isTask(val)) {
         this.addTask(key, val);
 
-      } else if (util.isTarget(val)) {
+      } else if (utils.isTarget(val)) {
         this.addTarget(key, val);
 
       } else {
@@ -111,10 +112,10 @@ Config.prototype.addTask = function(name, config) {
   if (typeof name !== 'string') {
     throw new TypeError('Config#addTask expects name to be a string');
   }
-  var task = new utils.Task(this.options);
-  utils.define(task, 'name', name);
+  var task = new Task(this.options);
+  define(task, 'name', name);
 
-  util.run(this, 'task', task);
+  utils.run(this, 'config', task);
   task.addTargets(config);
 
   this.tasks[name] = task;
@@ -138,10 +139,10 @@ Config.prototype.addTarget = function(name, config) {
   if (typeof name !== 'string') {
     throw new TypeError('Config#addTarget expects name to be a string');
   }
-  var target = new utils.Target(this.options);
-  utils.define(target, 'name', name);
+  var target = new Target(this.options);
+  define(target, 'name', name);
 
-  util.run(this, 'target', target);
+  utils.run(this, 'target', target);
   target.addFiles(config);
 
   this.targets[name] = target;
